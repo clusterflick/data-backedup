@@ -233,9 +233,14 @@ pack_week() {
     | sort_by(.tag)
   ' "$WORK/releases.json" > "$dir/releases.json"
 
-  # Files carry their release's publish time, so a restore keeps it.
+  # Files carry their release's publish time, so a restore keeps it. A
+  # release can have no assets - 20250608.060729 was published before its
+  # upload failed, from before data-transformed created releases as drafts -
+  # so it has no directory. It stays in releases.json with `assets: []`,
+  # which is what GitHub has.
   jq -r '.[] | [.tag, .publishedAt] | @tsv' "$dir/releases.json" |
     while IFS=$'\t' read -r tag published; do
+      [ -d "$dir/$tag" ] || continue
       find "$dir/$tag" -type f -exec touch -d "$published" {} +
     done
   touch -d "$(jq -r 'map(.publishedAt) | max' "$dir/releases.json")" "$dir/releases.json" "$dir/SHA256SUMS"
