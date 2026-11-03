@@ -175,12 +175,17 @@ download_week() {
 
   cut -f1 "$list" | sort -u | while read -r tag; do mkdir -p "$dir/$tag"; done
 
+  # GitHub's asset servers answer the odd download with a run of 504s. No
+  # --retry-delay, so curl backs off exponentially (1s, 2s, 4s...) and rides
+  # out a few minutes of that rather than giving up after 25s, as fixed 5s
+  # retries did. Eight at a time rather than 16 to ask less of it at once.
   cut -f1,2,5 "$list" | tr '\t' '\n' |
-    xargs -d '\n' -n 3 -P 16 sh -c '
+    xargs -d '\n' -n 3 -P 8 sh -c '
       curl --fail --silent --show-error --location \
-        --retry 5 --retry-all-errors --retry-delay 5 \
+        --retry 8 --retry-all-errors --retry-max-time 600 \
         --connect-timeout 30 --max-time 300 \
-        --output "$0/$1/$2" "$3"
+        --output "$0/$1/$2" "$3" ||
+        { echo "::error::Could not download $3" >&2; exit 1; }
     ' "$dir"
 
   # A missing sha256 is written as "-": tab is whitespace to `read`, so an
