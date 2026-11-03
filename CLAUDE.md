@@ -12,8 +12,9 @@ tar.xz per week. See README.md for the archive format and how to restore.
   `.env.example`). Must stay portable to macOS: no `find -printf`, no xz
   binary (`tar -xJ`), `shasum` where `sha256sum` is missing.
 - `.github/workflows/back-up.yml` - runs it, on each `data-transformed`
-  release (`repository_dispatch`) and daily from cron-job.org
-  (`workflow_dispatch`). Not a GitHub schedule: their timing is too poor.
+  release (`repository_dispatch`) and by hand (`workflow_dispatch`). There is
+  no schedule; if one is added, it is cron-job.org calling
+  `workflow_dispatch`, not a GitHub schedule, whose timing is too poor.
 
 No dependency on `clusterflick/scripts`, unlike the other `data-*` repos. The
 backup needs none of the pipeline's code, and pulling the latest pipeline

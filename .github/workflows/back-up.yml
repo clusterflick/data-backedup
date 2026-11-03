@@ -1,8 +1,8 @@
 # Backs up every finished week of clusterflick/data-transformed releases to
 # Cloudflare R2. See README.md for what is stored and how to restore it.
 #
-# Fired by data-transformed as it publishes a release, and daily by
-# cron-job.org through workflow_dispatch. The trigger carries nothing: every
+# Fired by data-transformed as it publishes a release, or by hand through
+# workflow_dispatch. The trigger carries nothing: every
 # run works out which finished weeks have no archive yet and builds them, so a
 # lost dispatch or a failed run is caught up by the next one.
 on:

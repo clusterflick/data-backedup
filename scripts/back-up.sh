@@ -6,7 +6,7 @@
 # Every run works out what is missing rather than acting on the release that
 # triggered it: it lists every release tag on GitHub and every archive in R2,
 # and builds each finished week that has no archive yet, oldest first. A failed run
-# is caught up by the next one - the next release, or the daily trigger.
+# is caught up by the next one - the next release, or a manual run.
 #
 # Required environment:
 #   GH_TOKEN               token for listing the releases

@@ -103,9 +103,10 @@ since R2 speaks the S3 API, and works on Linux and macOS.
 
 ## Schedule
 
-The workflow runs when `data-transformed` publishes a release, and daily via
-[cron-job.org](https://cron-job.org). It can also be triggered manually via
-workflow dispatch, with a different limit on the weeks it archives.
+The workflow runs when `data-transformed` publishes a release. It can also be
+triggered manually via workflow dispatch, with a different limit on the weeks
+it archives - which is also how a scheduler such as cron-job.org would run it,
+if the backup ever needs to keep going while the pipeline doesn't.
 
 ## Maintenance
 
