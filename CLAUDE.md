@@ -7,6 +7,10 @@ tar.xz per week. See README.md for the archive format and how to restore.
 ## Repo structure
 
 - `scripts/back-up.sh` - the whole job: list, build, verify, upload, check.
+- `scripts/download.sh` - mirrors the bucket locally for a person, with
+  optional `--verify` / `--extract`. Reads `.env` (gitignored; see
+  `.env.example`). Must stay portable to macOS: no `find -printf`, no xz
+  binary (`tar -xJ`), `shasum` where `sha256sum` is missing.
 - `.github/workflows/back-up.yml` - runs it, on each `data-transformed`
   release (`repository_dispatch`) and daily from cron-job.org
   (`workflow_dispatch`). Not a GitHub schedule: their timing is too poor.

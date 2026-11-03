@@ -2,3 +2,8 @@
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Local credentials and downloads (scripts/download.sh)
+.env
+backup/
+restored/

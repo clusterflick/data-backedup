@@ -83,6 +83,24 @@ To restore a single release, extract only its directory:
 xz --decompress --stdout data-transformed-2026-10-26.tar.xz | tar --extract --wildcards '20261101.*'
 ```
 
+## Downloading
+
+To mirror the whole bucket locally, copy `.env.example` to `.env` and fill it
+in with a **read-only** R2 token ("Object Read only", this bucket only), then:
+
+```bash
+scripts/download.sh
+```
+
+Archives go into `backup/`; running it again fetches only new weeks. It needs
+the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html),
+since R2 speaks the S3 API, and works on Linux and macOS.
+
+- `--verify` also unpacks each archive to a temporary directory and checks it
+  against its `SHA256SUMS`, one at a time.
+- `--extract` unpacks and checks each one into `restored/<archive>/`, and keeps
+  it. That is about 390MB per recent week, 15-20GB for the whole history.
+
 ## Schedule
 
 The workflow runs when `data-transformed` publishes a release, and daily via
