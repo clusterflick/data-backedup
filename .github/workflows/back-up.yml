@@ -1,0 +1,51 @@
+# Backs up every finished week of clusterflick/data-transformed releases to
+# Cloudflare R2. See README.md for what is stored and how to restore it.
+#
+# Fired by data-transformed as it publishes a release, and daily by
+# cron-job.org through workflow_dispatch. The trigger carries nothing: every
+# run works out which finished weeks have no archive yet and builds them, so a
+# lost dispatch or a failed run is caught up by the next one.
+on:
+  repository_dispatch:
+    types: [release_event]
+  workflow_dispatch:
+    inputs:
+      max_weeks:
+        description: "Most weeks to archive in this run"
+        type: number
+        default: 20
+
+name: Back Up Data
+
+permissions:
+  contents: read
+
+# Archives are write-once, so two runs overlapping could only fail, not
+# corrupt anything - but the second would fail loudly on a week the first had
+# just written. Queued instead; GitHub keeps only the newest pending run, which
+# loses nothing since every run does the whole job.
+concurrency:
+  group: back-up-data
+  cancel-in-progress: false
+
+jobs:
+  back_up:
+    name: Back Up Transformed Data
+    runs-on: ubuntu-latest
+    # A week takes about five minutes to download, pack and verify, so a run
+    # of MAX_WEEKS (20) fits with room to spare. A timeout loses nothing: each
+    # archive is uploaded as it is built.
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Back up finished weeks
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MAX_WEEKS: ${{ inputs.max_weeks || 20 }}
+          R2_ACCOUNT_ID: ${{ vars.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ vars.R2_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: scripts/back-up.sh
